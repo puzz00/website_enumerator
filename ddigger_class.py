@@ -2,7 +2,6 @@
 
 # a class which contains methods for enumerating websites
 
-from bs4 import BeautifulSoup
 import requests
 
 class DDigger:
