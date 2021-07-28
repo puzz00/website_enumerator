@@ -52,7 +52,7 @@ if options.wordlist:
 else:
     # creates a default wordlist to work with
     wordlist = ""
-    wordlist += "/home/win10/words.txt"
+    wordlist += "/usr/share/dirb/wordlists/common.txt"
 
 # instantiates a DDigger object
 digger = DDigger(url, wordlist)
