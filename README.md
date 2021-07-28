@@ -9,6 +9,7 @@ Flags:
 -w specify a wordlist - there is a default in the code but the path could be different on different operating systems
 -d get the program to try to find directories
 -s get the program to try to find subdomains
+-a get the DNS A Records for the found subdomains (needs dig to be installed on the system - already installed on Parrot and Kali)
 -h shows help
 
 Basic usage example:
