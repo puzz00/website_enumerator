@@ -10,6 +10,7 @@
 # it is therefore best to specify a wordlist you know exists on your OS
 # -d flag to find directories
 # -s flag to find subdomains
+# -a flag to retrieve DNS A Records (needs dig to be installed for this option to work)
 
 from ddigger_class import DDigger
 import optparse
@@ -26,6 +27,9 @@ parser.add_option("-s", "--subdomains", action="store_true", dest="subdomains",
                   default=False)
 parser.add_option("-d", "--directories", action="store_true", dest="directories",
                   help="Use -d to try to find directories",
+                  default=False)
+parser.add_option("-a", "--arecords", action="store_true", dest="arecords",
+                  help="Use -a to try to find DNS A Records (needs dig to be installed)",
                   default=False)
 
 options, args = parser.parse_args()
@@ -48,7 +52,7 @@ if options.wordlist:
 else:
     # creates a default wordlist to work with
     wordlist = ""
-    wordlist += "/usr/share/dirb/wordlists/common.txt"
+    wordlist += "/home/win10/words.txt"
 
 # instantiates a DDigger object
 digger = DDigger(url, wordlist)
@@ -59,7 +63,7 @@ if options.directories:
     dirs = digger.find_directories(url)
     if len(dirs) > 0:
         print("\n\n[++] The following directories are valid:\n\n")
-        i = 0
+        i = 1
         for directory in dirs:
             print("{}\t{}".format(i, directory))
             i += 1
@@ -69,14 +73,18 @@ if options.directories:
 if options.subdomains:
     # tries to find subdomains if the user specifies this with the -s flag
     print("\n\n[**] Trying to find subdomains...")
-    found_subdomains = digger.find_subdomains(url)
+    if options.arecords:
+        found_subdomains, a_records = digger.find_subdomains(url, True)
+    else:
+        found_subdomains, a_records = digger.find_subdomains(url, False)
     if len(found_subdomains) > 0:
         print("\n\n[++] The following subdomains are valid:\n\n")
-        i = 0
+        i = 1
         for sd in found_subdomains:
             print("{}:\t{}".format(i, sd))
             i += 1
+        print("\n\n[++] Here are their DNS A Records:\n\n")
+        for a in a_records:
+            print(a)
     else:
         print("\n\n[!!] No valid subdomains found!")
-
-
