@@ -3,11 +3,13 @@
 # a class which contains methods for enumerating websites
 
 import requests
+import subprocess
 
 class DDigger:
     # use a constructor to define what is needed for the class to work
     def __init__(self, target_url, passed_wordlist):
         self.dirs = []
+        self.dns_a = []
         self.sd_list = []
         self.url = target_url
         self.wordlist = passed_wordlist
@@ -19,6 +21,17 @@ class DDigger:
             return requests.get(url)
         except:
             pass
+
+    def get_ip(self, url):
+        # uses the subprocess run method to run a dig command in order to retrieve A records
+        if url[4] == "s":
+            ip_url = url[8:]
+        elif url[4] == ":":
+            ip_url = url[7:]
+        command = "dig +cmd {} +noall +answer".format(ip_url)
+        response = subprocess.run(command, capture_output=True,
+                                  text=True, shell=True)
+        return response.stdout
 
     def find_directories(self, url):
         # clears the list of discovered directories just in case this method is called more than once
@@ -35,7 +48,7 @@ class DDigger:
                     print("\n[++] Found directory --> " + test_url)
         return self.dirs
 
-    def find_subdomains(self, url):
+    def find_subdomains(self, url, dns):
         # prepares the URL for addition of the possible subdomain
         # takes into account if the URL is http or https
         if url[4] == "s":
@@ -46,8 +59,9 @@ class DDigger:
             domain = url[7:]
         else:
             return
-
+        # clears the dns_a list just in case this method is called more than once
         # clears the subdomain list just in case this method is called more than once
+        self.dns_a.clear()
         self.sd_list.clear()
         # tries every word in the given subdomain wordlist as a subdomain
         # adds any valid subdomain to a list of subdomains and avoids duplicating them
@@ -59,8 +73,9 @@ class DDigger:
                 if (response) and (test_url not in self.sd_list):
                     self.sd_list.append(test_url)
                     print("\n[++] Found sub-domain --> " + test_url)
-        return self.sd_list
-
-
-
-
+                    if dns:
+                        # tries to find the DNS A record for each valid subdomain
+                        ip = self.get_ip(test_url)
+                        self.dns_a.append(ip)
+                        print(ip)
+        return self.sd_list, self.dns_a
