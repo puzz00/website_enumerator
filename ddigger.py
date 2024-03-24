@@ -1,6 +1,6 @@
 #!usr/bin/python3
 
-# domain digger (ddigger) by puz00
+# domain digger (ddigger) by puzz00
 
 # instantiates a ddigger object which allows a user to enumerate a domain
 # -u flag for URL
